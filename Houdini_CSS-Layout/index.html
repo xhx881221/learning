@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            section {
+                display: layout(center);
+            }
+        </style>
+    </head>
+
+    <body>
+        <section alight="right">
+            <p>102.00</p>
+            <p>23.80</p>
+            <p>12,334.00</p>
+            <p>2.88</p>
+            <p>99.99</p>
+        </section>
+
+        <script>
+            if (window.CSS) {
+                CSS.layoutWorklet.addModule("layout-center.js");
+            }
+        </script>
+    </body>
+</html>

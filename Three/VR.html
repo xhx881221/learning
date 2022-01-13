@@ -1,0 +1,75 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>VR</title>
+        <style>
+            body {
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="module">
+            import * as THREE from 'https://cdn.skypack.dev/three@0.134.0';
+            import { OrbitControls } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/controls/OrbitControls.js';
+            let scene, camera, renderer;
+            let points = [{
+                position: {
+                    x: 0,
+                    y: 0,
+                    z: -0.2
+                },
+                details: {
+                    title: "信息点1"
+                }
+            }, {
+                position: {
+                    x: -0.2,
+                    y: -0.05,
+                    z: 0.2
+                },
+                details: {
+                    title: "信息点2"
+                }
+            }]
+
+            function initThree() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 100);
+                camera.position.set(0, 0, 0.01);
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+                let controls = new OrbitControls(camera, renderer.domElement);
+                let materials = [];
+                let texture_left = new THREE.TextureLoader().load("public/assets/scene_left.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_left }));
+                let texture_right = new THREE.TextureLoader().load("public/assets/scene_right.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_right }));
+                let texture_top = new THREE.TextureLoader().load("public/assets/scene_top.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_top }));
+                let texture_bottom = new THREE.TextureLoader().load("public/assets/scene_bottom.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_bottom }));
+                let texture_front = new THREE.TextureLoader().load("public/assets/scene_front.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_front }));
+                let texture_back = new THREE.TextureLoader().load("public/assets/scene_back.jpg");
+                materials.push(new THREE.MeshBasicMaterial({ map: texture_back }));
+                let box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), materials);
+                box.geometry.scale( 1, 1, -1 );
+
+                
+
+                scene.add(box);
+                loop();
+            }
+
+            function loop() {
+                requestAnimationFrame(loop);
+                renderer.render(scene, camera);
+            }
+
+            window.onload = initThree;
+        </script>
+    </body>
+</html>

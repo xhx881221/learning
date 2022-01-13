@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    
+    <body>
+        <div id="app">
+            <hoc msg="msg" @change="onChange">
+                <template>
+                    <div>I am slot</div>
+                </template>
+                <template v-slot:named>
+                    <div>I am named slot</div>
+                </template>
+            </hoc>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+          
+        <script>
+            var view = {
+                props: ["result"],
+                data() {
+                    return {
+                        requestParams: {
+                            name: 'ssh'
+                        }
+                    }
+                },
+                methods: {
+                    reload() {
+                        this.requestParams = {
+                            name: "changed!!",
+                        };
+                    },
+                },
+                template: `
+                    <span>
+                        <span>{{result?.name}}</span>
+                        <slot></slot>
+                        <slot name="named"></slot>
+                        <button @click="reload">重新加载数据</button>
+                    </span>
+                `
+            };
+
+            const withPromise = (wrapped, promiseFn) => {
+                return {
+                    data() {
+                        return {
+                            loading: false,
+                            error: false,
+                            result: null
+                        }
+                    },
+                    methods: {
+                        async request() {
+                            this.loading = true;
+                            const { requestParams } = this.$refs.wrapped;
+                            const result = await promiseFn(requestParams).finally(() => {
+                                this.loading = false;
+                            });
+                            this.result = result;
+                        }
+                    },
+                    async mounted() {
+                        this.$refs.wrapped.$watch("requestParams", this.request.bind(this), {
+                            immediate: true
+                        });
+                    },
+                    render(h) {
+                        const args = {
+                            props: {
+                                ...this.$attrs,
+                                result: this.result,
+                                loading: this.loading
+                            },
+                            
+                            on: this.$listeners,
+                            scopedSlots: this.$scopedSlots,
+                            ref: "wrapped"
+                        };
+
+                        const wrapper = h("div", [
+                            this.loading ? h("span", ["加载中……"]) : null,
+                            this.error ? h("span", ["加载错误"]) : null,
+                            h(wrapped, args),
+                        ]);
+
+                        return wrapper;
+                    },
+                };
+            };
+            
+            const request = (params) => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(params)
+                    }, 1000);
+                });
+            };
+
+            var hoc = withPromise(view, request);
+            
+            new Vue({
+                el: '#app',
+                components: {
+                    hoc
+                },
+                methods: {
+                    onChange() {}
+                }
+            })
+        </script>
+    </body>
+</html>
